@@ -2,6 +2,9 @@
 image: docker:latest
 
 variables:
+  # Hotfix for Docker DIND 19.03
+  DOCKER_TLS_CERTDIR: ""
+
   ADDON_GITHUB_REPO: "hassio-addons/addon-example"
   ADDON_SLUG: "example"
   ADDON_TARGET: "example"
