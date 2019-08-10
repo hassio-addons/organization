@@ -41,7 +41,7 @@ variables:
   
   SNYK_ORG: "community-hass.io-add-ons"
 
-  SNYK_DOCKER: "true"
+  SNYK_DOCKER: "false"
   SNYK_COMPOSER: "false"
   SNYK_NPM: "false"
   SNYK_PIP: "false"
