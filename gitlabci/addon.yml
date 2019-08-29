@@ -1,9 +1,8 @@
 ---
-image: docker:latest
+image: docker:19.03.1
 
 variables:
-  # Hotfix for Docker DIND 19.03
-  DOCKER_TLS_CERTDIR: ""
+  DOCKER_TLS_CERTDIR: "/certs"
 
   ADDON_GITHUB_REPO: "hassio-addons/addon-example"
   ADDON_SLUG: "example"
@@ -68,7 +67,7 @@ stages:
   before_script:
     - docker info
   services:
-    - name: docker:dind
+    - name: docker:19.03.1-dind
       command: ["--experimental"]
 
 # Generic preflight template
