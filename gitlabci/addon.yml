@@ -76,7 +76,7 @@ stages:
         --username gitlab-ci-token \
         --password-stdin \
         registry.gitlab.com
-    - docker pull "registry.gitlab.com/${CI_PROJECT_PATH}/${ADDON_ARCH}:cache" || true
+    - docker pull "registry.gitlab.com/${CI_PROJECT_PATH_SLUG}/${ADDON_ARCH}:cache" || true
     - |
       if [ "${ADDON_QEMU}" = "true" ] && [ "${ADDON_ARCH}" = "aarch64" ]; then
         apk --no-cache add curl
@@ -108,13 +108,13 @@ stages:
         --build-arg "BUILD_ARCH=${ADDON_ARCH}" \
         --build-arg "BUILD_REF=${CI_COMMIT_SHA}" \
         --build-arg "BUILD_VERSION=${VERSION}" \
-        --cache-from "registry.gitlab.com/${CI_PROJECT_PATH}/${ADDON_ARCH}:cache" \
+        --cache-from "registry.gitlab.com/${CI_PROJECT_PATH_SLUG}/${ADDON_ARCH}:cache" \
         --tag \
-          "registry.gitlab.com/${CI_PROJECT_PATH}/${ADDON_ARCH}:${CI_COMMIT_SHA}" \
+          "registry.gitlab.com/${CI_PROJECT_PATH_SLUG}/${ADDON_ARCH}:${CI_COMMIT_SHA}" \
         "${ADDON_TARGET}"
     - |
       docker push \
-        "registry.gitlab.com/${CI_PROJECT_PATH}/${ADDON_ARCH}:${CI_COMMIT_SHA}"
+        "registry.gitlab.com/${CI_PROJECT_PATH_SLUG}/${ADDON_ARCH}:${CI_COMMIT_SHA}"
 
 # Generic deploy template
 .deploy: &deploy
@@ -122,7 +122,7 @@ stages:
   stage: deploy
   before_script:
     - docker info
-    - docker pull "registry.gitlab.com/${CI_PROJECT_PATH}/${ADDON_ARCH}:${CI_COMMIT_SHA}"
+    - docker pull "registry.gitlab.com/${CI_PROJECT_PATH_SLUG}/${ADDON_ARCH}:${CI_COMMIT_SHA}"
     - |
       echo "${CI_JOB_TOKEN}" | docker login \
         --username gitlab-ci-token \
@@ -135,21 +135,21 @@ stages:
   script:
     - |
       docker tag \
-        "registry.gitlab.com/${CI_PROJECT_PATH}/${ADDON_ARCH}:${CI_COMMIT_SHA}" \
-        "registry.gitlab.com/${CI_PROJECT_PATH}/${ADDON_ARCH}:cache"
-    - docker push "registry.gitlab.com/${CI_PROJECT_PATH}/${ADDON_ARCH}:cache"
+        "registry.gitlab.com/${CI_PROJECT_PATH_SLUG}/${ADDON_ARCH}:${CI_COMMIT_SHA}" \
+        "registry.gitlab.com/${CI_PROJECT_PATH_SLUG}/${ADDON_ARCH}:cache"
+    - docker push "registry.gitlab.com/${CI_PROJECT_PATH_SLUG}/${ADDON_ARCH}:cache"
     - TAG="${CI_COMMIT_TAG#v}"
     - TAG="${TAG:-${CI_COMMIT_SHA:0:7}}"
     - |
       docker tag \
-        "registry.gitlab.com/${CI_PROJECT_PATH}/${ADDON_ARCH}:${CI_COMMIT_SHA}" \
+        "registry.gitlab.com/${CI_PROJECT_PATH_SLUG}/${ADDON_ARCH}:${CI_COMMIT_SHA}" \
         "${DOCKER_HUB_ORG}/${ADDON_SLUG}:${ADDON_ARCH}-${TAG}"
     - |
       docker push \
         "${DOCKER_HUB_ORG}/${ADDON_SLUG}:${ADDON_ARCH}-${TAG}"
     - |
       docker tag \
-        "registry.gitlab.com/${CI_PROJECT_PATH}/${ADDON_ARCH}:${CI_COMMIT_SHA}" \
+        "registry.gitlab.com/${CI_PROJECT_PATH_SLUG}/${ADDON_ARCH}:${CI_COMMIT_SHA}" \
         "${DOCKER_HUB_ORG}/${ADDON_SLUG}-${ADDON_ARCH}:${TAG}"
       docker push \
         "${DOCKER_HUB_ORG}/${ADDON_SLUG}-${ADDON_ARCH}:${TAG}"
